@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Data
 public class AppointmentDTO {
-    private int appointmentId;
+    private Integer appointmentId;
     private Date date;
     private String time;
     private String type;

@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.time.LocalDate;
 import java.util.Date;
 @Data
 @Entity
@@ -27,10 +28,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // IMPORTANTE: Deve essere IDENTITY per Postgres
     @Column(name = "user_id")
-    private int userId;
+    private Integer userId;
     @Column(name = "first_name")
      private String firstName;
-    @Column(name = "last_name ")
+    @Column(name = "last_name")
      private String lastName;
     @Column(name = "email")
      private String email;
@@ -39,7 +40,9 @@ public class User {
     @Column(name = "address")
      private String address;
     @Column(name = "dob")
-     private Date dob;
+     private LocalDate dob;
+    @Column(name = "birthplace")
+    private String birthplace;
     @Column(name = "fiscal_code", nullable = false, unique = true) // Vincolo anche a livello DB
      private String fiscalCode;
     @Column(name = "role")

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @OpenAPIDefinition(
         info = @Info(
-                title = "MedAPP - gestionario sanitarip",
+                title = "MedAPP - gestionario sanitario",
                 version = "1.0",
                 description = "Documentazione auto-generata con swagger del backend scritto per il project work AA2025/2026"
         )

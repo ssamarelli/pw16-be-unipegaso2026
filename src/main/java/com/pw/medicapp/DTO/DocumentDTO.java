@@ -6,11 +6,11 @@ import java.util.Date;
 
 @Data
 public class DocumentDTO {
-    private int documentId;
-    private String name;
+    private Integer documentId;
+    private String fileName;
     private String type;
     private Date uploadDate;
 
-    private int patientId;
+    private Integer patientId;
     private String patientFullName; // Comodo per il frontend
 }

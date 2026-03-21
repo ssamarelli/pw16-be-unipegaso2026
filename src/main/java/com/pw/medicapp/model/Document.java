@@ -19,7 +19,7 @@ public class Document{
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "document_id")
-    private int documentId;
+    private Integer documentId;
     @Column(name = "file_name")
     private String fileName;
     @Column(name = "upload_date")

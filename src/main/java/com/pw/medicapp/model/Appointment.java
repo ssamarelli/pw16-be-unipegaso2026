@@ -24,7 +24,7 @@ public class Appointment {
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "appointment_id")
-    private int appointmentId; // Cambia da String a int
+    private Integer appointmentId; // Cambia da String a int
     @Column(name = "appointment_date")
     private Date appointmentDate;
     @Column(name = "appointment_time")

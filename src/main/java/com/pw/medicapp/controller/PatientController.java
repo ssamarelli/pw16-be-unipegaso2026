@@ -1,6 +1,6 @@
 //package com.pw.medicapp.controller;
 //
-//import com.pw.medicapp.service.PatientService;
+//
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.http.ResponseEntity;
 //import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,26 +16,10 @@
 //@RequestMapping("api/patient")
 //public class PatientController {
 //
-//    @Autowired
-//    private PatientService patientService;
+////GET /api/patient/{id}/history
+////POST /api/patient/{id}/history
+////GET /api/patient/{id}/documents
+////POST /api/patient/{id}/documents/upload
+////DELETE /api/patient/{id}/documents/{docId}
 //
-//    @GetMapping("{id}")
-//    public ResponseEntity<?> getPatient(@PathVariable int id) {
-//        return patientService.getPatientById(id);
-//    }
-//
-//    @PostMapping("create-patient")
-//    public ResponseEntity<?> createPatient(@RequestBody Patient patient) {
-//        return patientService.createPatient(patient);
-//    }
-//
-//    @PutMapping("update-patient/{id}")
-//    public ResponseEntity<?> updatePatient(@PathVariable int id,@RequestBody Patient patient) {
-//        return patientService.updatePatient(id, patient);
-//    }
-//
-//    @DeleteMapping("delete-patient")
-//    public ResponseEntity<?> deletePatient(@PathVariable int id) {
-//        return patientService.deletePatient(id);
-//    }
 //}

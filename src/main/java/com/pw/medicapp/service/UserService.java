@@ -2,10 +2,7 @@ package com.pw.medicapp.service;
 
 import com.pw.medicapp.DTO.UserDTO;
 import com.pw.medicapp.mapper.UserMapper;
-import com.pw.medicapp.model.Doctor;
-import com.pw.medicapp.model.Patient;
 import com.pw.medicapp.model.User;
-import com.pw.medicapp.model.enums.UserRole;
 import com.pw.medicapp.repository.DoctorRepository;
 import com.pw.medicapp.repository.PatientRepository;
 import com.pw.medicapp.repository.UserRepository;
@@ -14,6 +11,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -30,17 +30,27 @@ public class UserService {
     @Autowired
     private DoctorRepository doctorRepository;
 
+
+    // Recupera tutti gli utenti
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toDto) // Converte ogni User/Patient/Doctor nel DTO corretto
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public UserDTO createUser(UserDTO userDTO) {
-        userDTO.setUserId(0);
+//        userDTO.setUserId(0);
 
         User user = userMapper.toEntity(userDTO);
         User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
     }
 
-    public UserDTO updateUser(int userId, UserDTO userDTO) {
-        User existingUser = userRepository.findById(userId)
+    @Transactional
+    public UserDTO updateUser(String fiscalCode, UserDTO userDTO) {
+        User existingUser = userRepository.findByFiscalCode(fiscalCode)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
 
         // Aggiorna l'entità esistente con i dati del DTO
@@ -50,11 +60,13 @@ public class UserService {
         return userMapper.toDto(updatedUser);
     }
 
-    public void deleteUser(int userId) {
-        if (!userRepository.existsById(userId)) {
+    @Transactional
+    public void deleteUser(String fiscalCode) {
+        if (!userRepository.existsByFiscalCode(fiscalCode)) {
             throw new RuntimeException("Impossibile eliminare: utente non trovato");
+
         }
-        userRepository.deleteById(userId);
+        userRepository.deleteByFiscalCode(fiscalCode);
     }
 
     public UserDTO getUserByFiscalCode(String fiscalCode) {

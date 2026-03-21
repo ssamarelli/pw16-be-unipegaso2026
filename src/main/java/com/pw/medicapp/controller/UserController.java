@@ -1,17 +1,21 @@
 package com.pw.medicapp.controller;
 
+
 import com.pw.medicapp.DTO.UserDTO;
 import com.pw.medicapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/user")
@@ -20,19 +24,36 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+    // GET /api/user
+    @GetMapping("list")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        // Recupera la lista di tutti gli utenti dal service
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    // GET /api/user/fiscalCode/{fc}
+    @GetMapping("/fiscalCode/{fiscalCode}")
+    public ResponseEntity<UserDTO> getUserByFiscalCode(@PathVariable String fiscalCode) {
+        // Cerca l'utente per codice fiscale
+        return ResponseEntity.ok(userService.getUserByFiscalCode(fiscalCode));
+    }
+
     @PostMapping("/new-user")
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(userService.createUser(userDTO));
     }
 
-    @PutMapping("/update-user/{userId}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable int userId, @RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.updateUser(userId, userDTO));
+    //devo poter modificare anche un solo campo alla volta
+    @PutMapping("/update-user/{fiscalCode}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String fiscalCode, @RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.updateUser(fiscalCode, userDTO));
     }
 
-    @DeleteMapping("/delete-user/{userId}")
-    public ResponseEntity<UserDTO> deleteUser(@PathVariable int userId) {
-        userService.deleteUser(userId);
+    //errore
+    @DeleteMapping("/delete-user/{fiscalCode}")
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable String fiscalCode) {
+        userService.deleteUser(fiscalCode);
         return ResponseEntity.noContent().build();
     }
 

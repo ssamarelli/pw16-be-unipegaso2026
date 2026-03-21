@@ -9,6 +9,6 @@ public class AppointmentRequest {
     private Date date;
     private String time;
     private String type;
-    private int patientId;
-    private int doctorId;
+    private Integer patientId;
+    private Integer doctorId;
 }
