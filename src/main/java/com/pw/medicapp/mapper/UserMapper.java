@@ -26,6 +26,12 @@ public interface UserMapper {
     DoctorDTO toDto(Doctor doctor);
     Doctor toEntity(DoctorDTO doctorDTO);
 
+    // Mapping verso l'entità specifica Doctor
+    Doctor toDoctorEntity(UserDTO userDTO);
+
+    // Mapping verso l'entità specifica Patient
+    Patient toPatientEntity(UserDTO userDTO);
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "userId", ignore = true)
     void updateEntityFromDto(UserDTO userDTO, @MappingTarget User existingUser);

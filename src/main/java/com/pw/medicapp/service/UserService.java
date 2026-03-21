@@ -3,6 +3,8 @@ package com.pw.medicapp.service;
 import com.pw.medicapp.DTO.UserDTO;
 import com.pw.medicapp.mapper.UserMapper;
 import com.pw.medicapp.model.User;
+import com.pw.medicapp.model.enums.UserRole;
+import com.pw.medicapp.repository.AppointmentRepository;
 import com.pw.medicapp.repository.DoctorRepository;
 import com.pw.medicapp.repository.PatientRepository;
 import com.pw.medicapp.repository.UserRepository;
@@ -30,6 +32,9 @@ public class UserService {
     @Autowired
     private DoctorRepository doctorRepository;
 
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
 
     // Recupera tutti gli utenti
     public List<UserDTO> getAllUsers() {
@@ -41,10 +46,22 @@ public class UserService {
 
     @Transactional
     public UserDTO createUser(UserDTO userDTO) {
-//        userDTO.setUserId(0);
+        User user;
 
-        User user = userMapper.toEntity(userDTO);
+        // Determiniamo quale entità specifica creare in base al ruolo
+        if (userDTO.getRole() == UserRole.DOCTOR) {
+            user = userMapper.toDoctorEntity(userDTO);
+        } else if (userDTO.getRole() == UserRole.PATIENT) {
+            user = userMapper.toPatientEntity(userDTO);
+        } else {
+            user = userMapper.toEntity(userDTO);
+        }
+
+        user.setUserId(null);
+
+        // Il save gestirà l'inserimento in entrambe le tabelle (users + doctors/patients)
         User savedUser = userRepository.save(user);
+
         return userMapper.toDto(savedUser);
     }
 
@@ -62,11 +79,19 @@ public class UserService {
 
     @Transactional
     public void deleteUser(String fiscalCode) {
-        if (!userRepository.existsByFiscalCode(fiscalCode)) {
-            throw new RuntimeException("Impossibile eliminare: utente non trovato");
+        // 1. Recuperiamo l'utente completo dal database
+        User user = userRepository.findByFiscalCode(fiscalCode)
+                .orElseThrow(() -> new RuntimeException("Impossibile eliminare: utente non trovato"));
 
+        // 2. Cancelliamo gli appuntamenti in base al ruolo
+        if (user.getRole() == UserRole.PATIENT) {
+            appointmentRepository.deleteByPatient_UserId(user.getUserId());
+        } else if (user.getRole() == UserRole.DOCTOR) {
+            appointmentRepository.deleteByDoctor_UserId(user.getUserId());
         }
-        userRepository.deleteByFiscalCode(fiscalCode);
+
+        // 3. Ora che i vincoli di integrità (Foreign Key) sono rispettati, eliminiamo l'utente
+        userRepository.delete(user);
     }
 
     public UserDTO getUserByFiscalCode(String fiscalCode) {
