@@ -1,7 +1,11 @@
 package com.pw.medicapp.service;
 
+import com.pw.medicapp.DTO.DoctorDTO;
+import com.pw.medicapp.DTO.PatientDTO;
 import com.pw.medicapp.DTO.UserDTO;
 import com.pw.medicapp.mapper.UserMapper;
+import com.pw.medicapp.model.Doctor;
+import com.pw.medicapp.model.Patient;
 import com.pw.medicapp.model.User;
 import com.pw.medicapp.model.enums.UserRole;
 import com.pw.medicapp.repository.AppointmentRepository;
@@ -70,9 +74,21 @@ public class UserService {
         User existingUser = userRepository.findByFiscalCode(fiscalCode)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
 
-        // Aggiorna l'entità esistente con i dati del DTO
-        userMapper.updateEntityFromDto(userDTO, existingUser);
+        // Se l'oggetto arrivato è un PatientDTO e l'entità è un Patient
+        if (userDTO instanceof PatientDTO patientDTO && existingUser instanceof Patient patient) {
+            userMapper.updatePatientFromDto(patientDTO, patient);
+        }
+        // Se l'oggetto arrivato è un DoctorDTO e l'entità è un Doctor
+        else if (userDTO instanceof DoctorDTO doctorDTO && existingUser instanceof Doctor doctor) {
+            userMapper.updateDoctorFromDto(doctorDTO, doctor);
+        }
+        // Altrimenti aggiornamento generico User
+        else {
+            userMapper.updateEntityFromDto(userDTO, existingUser);
+        }
 
+        // Hibernate rileva le modifiche sugli oggetti 'patient' o 'doctor'
+        // perché sono reference dell'oggetto 'existingUser'
         User updatedUser = userRepository.save(existingUser);
         return userMapper.toDto(updatedUser);
     }

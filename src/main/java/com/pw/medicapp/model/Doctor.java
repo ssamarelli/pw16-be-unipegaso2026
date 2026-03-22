@@ -19,6 +19,4 @@ public class Doctor extends User{
     @Column(name = "medical_license_number")
     private String medicalLicenseNumber;
 
-
-
 }

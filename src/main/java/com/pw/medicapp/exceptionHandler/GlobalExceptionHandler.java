@@ -1,4 +1,4 @@
-package com.pw.medicapp.exception;
+package com.pw.medicapp.exceptionHandler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

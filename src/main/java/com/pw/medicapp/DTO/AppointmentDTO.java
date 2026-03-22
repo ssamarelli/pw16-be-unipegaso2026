@@ -9,9 +9,10 @@ public class AppointmentDTO {
     private Integer appointmentId;
     private Date date;
     private String time;
-    private String type;
-    private String status;
 
-    private PatientDTO patient;
-    private DoctorDTO doctor;
+    private Integer doctorId;  // Per la logica JS
+    private String doctorName; // Per visualizzazione veloce
+
+    private Integer patientId;
+    private String patientName;
 }

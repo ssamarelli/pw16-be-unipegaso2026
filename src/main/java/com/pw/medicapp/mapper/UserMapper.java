@@ -35,4 +35,12 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "userId", ignore = true)
     void updateEntityFromDto(UserDTO userDTO, @MappingTarget User existingUser);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "userId", ignore = true)
+    void updateDoctorFromDto(DoctorDTO doctorDTO, @MappingTarget Doctor existingDoctor);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "userId", ignore = true)
+    void updatePatientFromDto(PatientDTO patientDTO, @MappingTarget Patient existingPatient);
 }
