@@ -41,10 +41,19 @@ public class UserService {
 
 
     // Recupera tutti gli utenti
-    public List<UserDTO> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .map(userMapper::toDto) // Converte ogni User/Patient/Doctor nel DTO corretto
+    public List<UserDTO> getAllUsers(UserRole role) {
+        List<User> users;
+
+        if (role != null) {
+            // Filtriamo per ruolo se specificato
+            users = userRepository.findByRole(role);
+        } else {
+            // Altrimenti recuperiamo tutti gli utenti
+            users = userRepository.findAll();
+        }
+
+        return users.stream()
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
 

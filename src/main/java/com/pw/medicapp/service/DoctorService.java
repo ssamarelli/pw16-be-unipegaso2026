@@ -36,15 +36,6 @@ public class DoctorService {
     private AppointmentMapper appointmentMapper;
 
 
-
-    // Recupera SOLO i dottori
-    public List<DoctorDTO> getAllDoctors() {
-        return doctorRepository.findAll()
-                .stream()
-                .map(userMapper::toDto) // MapStruct userà automaticamente Doctor -> DoctorDTO
-                .collect(Collectors.toList());
-    }
-
     public List<PatientDTO> getPatientsByDoctor(String fiscalCode) {
         // Verifichiamo prima se il dottore esiste
          User user = userRepository.findByFiscalCode(fiscalCode)

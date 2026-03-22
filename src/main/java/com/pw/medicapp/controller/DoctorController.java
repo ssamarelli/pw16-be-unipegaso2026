@@ -28,11 +28,6 @@ public class DoctorController {
     @Autowired
     private DoctorService doctorService;
 
-    //GET /api/doctor/all
-    @GetMapping("list")
-    public ResponseEntity<List<DoctorDTO>> getAllDoctors() {
-        return ResponseEntity.ok(doctorService.getAllDoctors());
-    }
 
      //GET /api/doctor/{id}/appointments
     @GetMapping("/{fiscalCode}/appointments")

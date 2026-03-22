@@ -2,6 +2,7 @@ package com.pw.medicapp.controller;
 
 
 import com.pw.medicapp.DTO.UserDTO;
+import com.pw.medicapp.model.enums.UserRole;
 import com.pw.medicapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -27,9 +29,9 @@ public class UserController {
 
     // GET /api/user
     @GetMapping("list")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(required = false) UserRole role) {
         // Recupera la lista di tutti gli utenti dal service
-        return ResponseEntity.ok(userService.getAllUsers());
+        return ResponseEntity.ok(userService.getAllUsers(role));
     }
 
     // GET /api/user/fiscalCode/{fc}
