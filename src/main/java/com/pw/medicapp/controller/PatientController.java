@@ -6,7 +6,9 @@ import com.pw.medicapp.service.PatientService;
 import com.pw.medicapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,10 +30,18 @@ public class PatientController {
             @RequestBody PatientDTO patientDTO) {
         return ResponseEntity.ok(userService.updateUser(fiscalCode, patientDTO));
     }
-//GET /api/patient/{id}/history
-
-//POST /api/patient/{id}/history
-
+    //GET /api/patient/{fiscalCode}/history
+    @GetMapping("/{fiscalCode}/get-history")
+    public ResponseEntity<PatientDTO> getHistory(@PathVariable String fiscalCode) {
+        return ResponseEntity.ok(patientService.getPatientHistory(fiscalCode));
+    }
+    //POST /api/patient/{fiscalCode}/history
+    @PostMapping("/{fiscalCode}/new-history")
+    public ResponseEntity<PatientDTO> saveHistory(
+            @PathVariable String fiscalCode,
+            @RequestBody PatientDTO historyDto) {
+        return ResponseEntity.ok(patientService.updatePatientHistory(fiscalCode, historyDto));
+    }
 //GET /api/patient/{id}/documents
 
 //POST /api/patient/{id}/documents/upload
