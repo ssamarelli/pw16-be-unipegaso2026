@@ -77,4 +77,26 @@ public class AppointmentService{
         return appointmentMapper.toDto(saved);
     }
 
+    @Transactional
+    public AppointmentDTO updateAppointment(Integer id, AppointmentDTO dto) {
+        // 1. Cerchiamo l'appuntamento esistente
+        Appointment existingAppointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appuntamento non trovato con ID: " + id));
+
+        // 2. Usiamo il mapper per aggiornare l'entità esistente con i dati del DTO
+        // Nota: il mapper ignorerà l'ID e i campi nulli se configurato correttamente
+        appointmentMapper.updateEntityFromDto(dto, existingAppointment);
+
+        // 3. Salvataggio (l'update su DB avviene automaticamente grazie a @Transactional)
+        Appointment updated = appointmentRepository.save(existingAppointment);
+        return appointmentMapper.toDto(updated);
+    }
+
+    @Transactional
+    public void deleteAppointment(Integer id) {
+        if (!appointmentRepository.existsById(id)) {
+            throw new RuntimeException("Impossibile eliminare: appuntamento non trovato");
+        }
+        appointmentRepository.deleteById(id);
+    }
 }

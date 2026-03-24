@@ -19,6 +19,7 @@ public class MailService {
                 "Ti confermiamo che il tuo appuntamento è stato registrato con successo.\n\n" +
                 "Dettagli:\n" +
                 "- Data: " + date + "\n" +
+                "- Data: " + date + "\n" +
                 "- Orario: " + time + "\n" +
                 "- Medico: Dott. " + doctorName + "\n\n" +
                 "Cordiali saluti,\nLo staff di MedApp");
