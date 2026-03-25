@@ -9,7 +9,6 @@ import com.pw.medicapp.model.enums.AppointmentStatus;
 import com.pw.medicapp.repository.AppointmentRepository;
 import com.pw.medicapp.repository.DoctorRepository;
 import com.pw.medicapp.repository.PatientRepository;
-import com.pw.medicapp.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,24 +78,62 @@ public class AppointmentService{
 
     @Transactional
     public AppointmentDTO updateAppointment(Integer id, AppointmentDTO dto) {
-        // 1. Cerchiamo l'appuntamento esistente
-        Appointment existingAppointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appuntamento non trovato con ID: " + id));
+        // 1. Recupero appuntamento esistente
+        Appointment existing = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appuntamento non trovato"));
 
-        // 2. Usiamo il mapper per aggiornare l'entità esistente con i dati del DTO
-        // Nota: il mapper ignorerà l'ID e i campi nulli se configurato correttamente
-        appointmentMapper.updateEntityFromDto(dto, existingAppointment);
+        // 2. Salviamo i vecchi valori per la mail
+        String oldDate = existing.getAppointmentDate().toString();
+        String oldTime = String.valueOf(existing.getAppointmentTime());
 
-        // 3. Salvataggio (l'update su DB avviene automaticamente grazie a @Transactional)
-        Appointment updated = appointmentRepository.save(existingAppointment);
+        // 3. Applichiamo le modifiche tramite Mapper
+        appointmentMapper.updateEntityFromDto(dto, existing);
+
+        // 4. Salvataggio
+        Appointment updated = appointmentRepository.save(existing);
+
+        // 5. Logica Invio Mail se data o ora sono cambiate
+        if (!oldDate.equals(updated.getAppointmentDate().toString()) || !oldTime.equals(updated.getAppointmentTime())) {
+            try {
+                mailService.sendAppointmentUpdate(
+                        updated.getPatient().getEmail(),
+                        updated.getPatient().getFirstName(),
+                        oldDate,
+                        oldTime,
+                        updated.getAppointmentDate().toString(),
+                        String.valueOf(updated.getAppointmentTime()),
+                        updated.getDoctor().getLastName()
+                );
+            } catch (Exception e) {
+                System.err.println("Errore invio mail modifica: " + e.getMessage());
+            }
+        }
+
         return appointmentMapper.toDto(updated);
     }
 
     @Transactional
     public void deleteAppointment(Integer id) {
-        if (!appointmentRepository.existsById(id)) {
-            throw new RuntimeException("Impossibile eliminare: appuntamento non trovato");
+        // 1. Recuperiamo l'appuntamento completo prima di cancellarlo
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Impossibile eliminare: appuntamento non trovato"));
+
+        // 2. Salviamo i dati necessari per la mail
+        String patientEmail = appointment.getPatient().getEmail();
+        String patientName = appointment.getPatient().getFirstName();
+        String date = appointment.getAppointmentDate().toString();
+        String time = String.valueOf(appointment.getAppointmentTime());
+        String doctorName = appointment.getDoctor().getLastName();
+
+        // 3. Eliminiamo il record dal DB
+        appointmentRepository.delete(appointment);
+
+        // 4. Inviamo la mail di notifica
+        try {
+            mailService.sendAppointmentCancellation(patientEmail, patientName, date, time, doctorName);
+        } catch (Exception e) {
+            // Logghiamo l'errore ma l'eliminazione resta valida
+            System.err.println("Errore nell'invio della mail di cancellazione: " + e.getMessage());
         }
-        appointmentRepository.deleteById(id);
     }
 }

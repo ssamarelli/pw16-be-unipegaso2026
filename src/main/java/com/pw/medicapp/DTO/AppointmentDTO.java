@@ -1,5 +1,8 @@
 package com.pw.medicapp.DTO;
 
+import com.pw.medicapp.model.enums.AppointmentStatus;
+import com.pw.medicapp.model.enums.AppointmentType;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,10 +12,12 @@ public class AppointmentDTO {
     private Integer appointmentId;
     private Date date;
     private String time;
-    @NotNull(message = "L'ID del dottore è obbligatorio"
+    @NotNull(message = "L'ID del dottore è obbligatorio")
     private Integer doctorId;  // Per la logica JS
     private String doctorName; // Per visualizzazione veloce
     @NotNull(message = "L'ID del paziente è obbligatorio")
     private Integer patientId;
     private String patientName;
+    private AppointmentType type;
+    private AppointmentStatus status;
 }
