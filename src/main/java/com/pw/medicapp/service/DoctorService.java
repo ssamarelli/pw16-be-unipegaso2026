@@ -1,15 +1,12 @@
 package com.pw.medicapp.service;
 
 import com.pw.medicapp.DTO.AppointmentDTO;
-import com.pw.medicapp.DTO.DoctorDTO;
 import com.pw.medicapp.DTO.PatientDTO;
 import com.pw.medicapp.mapper.AppointmentMapper;
 import com.pw.medicapp.mapper.UserMapper;
-import com.pw.medicapp.model.Doctor;
 import com.pw.medicapp.model.User;
 import com.pw.medicapp.repository.AppointmentRepository;
 import com.pw.medicapp.repository.DoctorRepository;
-import com.pw.medicapp.repository.PatientRepository;
 import com.pw.medicapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

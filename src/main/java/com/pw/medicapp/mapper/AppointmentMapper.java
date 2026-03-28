@@ -11,9 +11,9 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring")
 public interface AppointmentMapper {
 
-    @Mapping(source = "doctor.fiscalCode", target = "doctorFiscalCode")
+    @Mapping(source = "doctor.userId", target = "doctorId")
     @Mapping(source = "doctor.lastName", target = "doctorName")
-    @Mapping(source = "patient.fiscalCode", target = "patientFiscalCode")
+    @Mapping(source = "patient.userId", target = "patientId")
     @Mapping(source = "patient.lastName", target = "patientName")
     AppointmentDTO toDto(Appointment appointment);
 

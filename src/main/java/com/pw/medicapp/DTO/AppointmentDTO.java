@@ -1,5 +1,6 @@
 package com.pw.medicapp.DTO;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,7 +10,7 @@ public class AppointmentDTO {
     private Integer appointmentId;
     private Date date;
     private String time;
-    @NotNull(message = "L'ID del dottore è obbligatorio"
+    @NotNull(message = "L'ID del dottore è obbligatorio")
     private Integer doctorId;  // Per la logica JS
     private String doctorName; // Per visualizzazione veloce
     @NotNull(message = "L'ID del paziente è obbligatorio")

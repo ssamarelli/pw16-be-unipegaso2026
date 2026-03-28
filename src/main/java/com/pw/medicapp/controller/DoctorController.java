@@ -4,7 +4,6 @@ import com.pw.medicapp.DTO.AppointmentDTO;
 import com.pw.medicapp.DTO.DoctorDTO;
 import com.pw.medicapp.DTO.PatientDTO;
 import com.pw.medicapp.DTO.UserDTO;
-import com.pw.medicapp.repository.UserRepository;
 import com.pw.medicapp.service.DoctorService;
 import com.pw.medicapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
