@@ -1,5 +1,6 @@
 package com.pw.medicapp.controller;
 
+import com.pw.medicapp.DTO.HistoryDTO;
 import com.pw.medicapp.DTO.PatientDTO;
 import com.pw.medicapp.DTO.UserDTO;
 import com.pw.medicapp.service.PatientService;
@@ -24,28 +25,16 @@ public class PatientController {
     @Autowired
     private UserService userService;
 
-    @PutMapping("/{fiscalCode}")
-    public ResponseEntity<UserDTO> updatePatient(
+    @PutMapping("/{fiscalCode}/history")
+    public ResponseEntity<PatientDTO> updateHistory(
             @PathVariable String fiscalCode,
-            @RequestBody PatientDTO patientDTO) {
-        return ResponseEntity.ok(userService.updateUser(fiscalCode, patientDTO));
+            @RequestBody HistoryDTO historyDTO) {
+        return ResponseEntity.ok(patientService.updatePatientHistory(fiscalCode, historyDTO));
     }
-    //GET /api/patient/{fiscalCode}/history
+
     @GetMapping("/{fiscalCode}/get-history")
     public ResponseEntity<PatientDTO> getHistory(@PathVariable String fiscalCode) {
         return ResponseEntity.ok(patientService.getPatientHistory(fiscalCode));
     }
-    //POST /api/patient/{fiscalCode}/history
-    @PostMapping("/{fiscalCode}/new-history")
-    public ResponseEntity<PatientDTO> saveHistory(
-            @PathVariable String fiscalCode,
-            @RequestBody PatientDTO historyDto) {
-        return ResponseEntity.ok(patientService.updatePatientHistory(fiscalCode, historyDto));
-    }
-//GET /api/patient/{id}/documents
-
-//POST /api/patient/{id}/documents/upload
-
-//DELETE /api/patient/{id}/documents/{docId}
 
 }

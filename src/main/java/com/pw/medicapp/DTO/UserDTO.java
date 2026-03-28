@@ -1,6 +1,7 @@
 package com.pw.medicapp.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pw.medicapp.model.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
@@ -42,6 +43,6 @@ public class UserDTO {
     @Size(min = 16, max = 16, message = "Il codice fiscale deve essere di 16 caratteri")
     private String fiscalCode;
 
-    @NotNull(message = "Il ruolo è obbligatorio")
+    @JsonIgnore
     private UserRole role;
 }

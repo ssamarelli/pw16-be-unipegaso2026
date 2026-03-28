@@ -56,6 +56,8 @@ public class AppointmentService{
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
         appointment.setAppointmentStatus(AppointmentStatus.CONFIRMED);
+        appointment.setAppointmentType(dto.getType()); // ← aggiungi questa riga
+
 
         Appointment saved = appointmentRepository.save(appointment);
 
@@ -83,25 +85,39 @@ public class AppointmentService{
                 .orElseThrow(() -> new RuntimeException("Appuntamento non trovato"));
 
         // 2. Salviamo i vecchi valori per la mail
-        String oldDate = existing.getAppointmentDate().toString();
-        String oldTime = String.valueOf(existing.getAppointmentTime());
+        String oldDate = existing.getAppointmentDate() != null ? existing.getAppointmentDate().toString() : null;
+        String oldTime = existing.getAppointmentTime() != null ? existing.getAppointmentTime().toString() : null;
 
-        // 3. Applichiamo le modifiche tramite Mapper
+        // 3. Applichiamo le modifiche tramite Mapper (campi base)
         appointmentMapper.updateEntityFromDto(dto, existing);
 
-        // 4. Salvataggio
+        // 4. Setta esplicitamente type e status (arrivano da @RequestParam, non dal mapper)
+        if (dto.getType() != null) {
+            existing.setAppointmentType(dto.getType());
+        }
+        if (dto.getStatus() != null) {
+            existing.setAppointmentStatus(dto.getStatus());
+        }
+
+        // 5. Salvataggio
         Appointment updated = appointmentRepository.save(existing);
 
-        // 5. Logica Invio Mail se data o ora sono cambiate
-        if (!oldDate.equals(updated.getAppointmentDate().toString()) || !oldTime.equals(updated.getAppointmentTime())) {
+        // 6. Invio mail se data o ora sono cambiate
+        String newDate = updated.getAppointmentDate() != null ? updated.getAppointmentDate().toString() : null;
+        String newTime = updated.getAppointmentTime() != null ? updated.getAppointmentTime().toString() : null;
+
+        boolean dateChanged = oldDate != null && !oldDate.equals(newDate);
+        boolean timeChanged = oldTime != null && !oldTime.equals(newTime);
+
+        if (dateChanged || timeChanged) {
             try {
                 mailService.sendAppointmentUpdate(
                         updated.getPatient().getEmail(),
                         updated.getPatient().getFirstName(),
                         oldDate,
                         oldTime,
-                        updated.getAppointmentDate().toString(),
-                        String.valueOf(updated.getAppointmentTime()),
+                        newDate,
+                        newTime,
                         updated.getDoctor().getLastName()
                 );
             } catch (Exception e) {

@@ -2,6 +2,8 @@ package com.pw.medicapp.controller;
 
 
 import com.pw.medicapp.DTO.AppointmentDTO;
+import com.pw.medicapp.model.enums.AppointmentStatus;
+import com.pw.medicapp.model.enums.AppointmentType;
 import com.pw.medicapp.service.AppointmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -33,20 +36,26 @@ public class AppointmentController {
     }
 
 //POST /api/appointments
-    @PostMapping("/new-appointment")
-    public ResponseEntity<AppointmentDTO> createAppointment(@Valid @RequestBody AppointmentDTO appointmentDTO) {
-        // Il service si occuperà di salvare sul DB e inviare la mail
-        AppointmentDTO createdAppointment = appointmentService.createAppointment(appointmentDTO);
-
-        // Restituiamo 201 Created invece di un semplice 200 OK
-        return new ResponseEntity<>(createdAppointment, HttpStatus.CREATED);
+@PostMapping("/new-appointment")
+public ResponseEntity<AppointmentDTO> createAppointment(
+        @Valid @RequestBody AppointmentDTO appointmentDTO,
+        @RequestParam AppointmentType type,
+        @RequestParam(required = false, defaultValue = "CONFIRMED") AppointmentStatus status) {
+    appointmentDTO.setType(type);
+    appointmentDTO.setStatus(status);
+    AppointmentDTO createdAppointment = appointmentService.createAppointment(appointmentDTO);
+    return new ResponseEntity<>(createdAppointment, HttpStatus.CREATED);
 }
 
     // PUT /api/appointments/{id}
     @PutMapping("/update/{id}")
     public ResponseEntity<AppointmentDTO> updateAppointment(
             @PathVariable Integer id,
-            @RequestBody AppointmentDTO dto) {
+            @RequestBody AppointmentDTO dto,
+            @RequestParam AppointmentType type,
+            @RequestParam(required = false, defaultValue = "CONFIRMED") AppointmentStatus status) {
+        dto.setType(type);
+        dto.setStatus(status);
         return ResponseEntity.ok(appointmentService.updateAppointment(id, dto));
     }
 

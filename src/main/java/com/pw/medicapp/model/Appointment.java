@@ -13,6 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Data
@@ -26,9 +28,9 @@ public class Appointment {
     @Column(name = "appointment_id")
     private Integer appointmentId; // Cambia da String a int
     @Column(name = "appointment_date")
-    private Date appointmentDate;
+    private LocalDate appointmentDate;
     @Column(name = "appointment_time")
-    private Time appointmentTime;
+    private LocalTime appointmentTime;
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private AppointmentType appointmentType;
