@@ -1,5 +1,7 @@
 package com.pw.medicapp.DTO;
 
+import com.pw.medicapp.model.enums.AppointmentStatus;
+import com.pw.medicapp.model.enums.AppointmentType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -16,4 +18,6 @@ public class AppointmentDTO {
     @NotNull(message = "L'ID del paziente è obbligatorio")
     private Integer patientId;
     private String patientName;
+    private AppointmentType type;
+    private AppointmentStatus status;
 }

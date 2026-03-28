@@ -18,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-//    private Integer userId; // Sarà ignorato in fase di insert
+    private Integer userId; // Sarà ignorato in fase di insert
 
     @NotBlank(message = "Il nome è obbligatorio")
     private String firstName;
