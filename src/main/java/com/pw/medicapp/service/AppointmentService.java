@@ -13,6 +13,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,12 +66,16 @@ public class AppointmentService{
 
         // 3. INVIO MAIL (Logica aggiunta)
         try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dataFormat = saved.getAppointmentDate().format(formatter);
             mailService.sendAppointmentConfirmation(
+                    appointment.getAppointmentId(),
                     patient.getEmail(),
                     patient.getFirstName(),
-                    saved.getAppointmentDate().toString(),
+                    saved.getAppointmentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                     saved.getAppointmentTime().toString(),
-                    doctor.getLastName()
+                    doctor.getLastName(),
+                    saved.getAppointmentType().toString()
             );
         } catch (Exception e) {
             // Logga l'errore ma non bloccare la creazione dell'appuntamento se la mail fallisce
@@ -80,45 +87,34 @@ public class AppointmentService{
 
     @Transactional
     public AppointmentDTO updateAppointment(Integer id, AppointmentDTO dto) {
-        // 1. Recupero appuntamento esistente
         Appointment existing = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appuntamento non trovato"));
 
-        // 2. Salviamo i vecchi valori per la mail
-        String oldDate = existing.getAppointmentDate() != null ? existing.getAppointmentDate().toString() : null;
-        String oldTime = existing.getAppointmentTime() != null ? existing.getAppointmentTime().toString() : null;
+        // Salviamo gli oggetti originali per il confronto
+        LocalDate oldDate = existing.getAppointmentDate();
+        LocalTime oldTime = existing.getAppointmentTime();
 
-        // 3. Applichiamo le modifiche tramite Mapper (campi base)
         appointmentMapper.updateEntityFromDto(dto, existing);
 
-        // 4. Setta esplicitamente type e status (arrivano da @RequestParam, non dal mapper)
-        if (dto.getType() != null) {
-            existing.setAppointmentType(dto.getType());
-        }
-        if (dto.getStatus() != null) {
-            existing.setAppointmentStatus(dto.getStatus());
-        }
+        if (dto.getType() != null) existing.setAppointmentType(dto.getType());
+        if (dto.getStatus() != null) existing.setAppointmentStatus(dto.getStatus());
 
-        // 5. Salvataggio
         Appointment updated = appointmentRepository.save(existing);
 
-        // 6. Invio mail se data o ora sono cambiate
-        String newDate = updated.getAppointmentDate() != null ? updated.getAppointmentDate().toString() : null;
-        String newTime = updated.getAppointmentTime() != null ? updated.getAppointmentTime().toString() : null;
-
-        boolean dateChanged = oldDate != null && !oldDate.equals(newDate);
-        boolean timeChanged = oldTime != null && !oldTime.equals(newTime);
-
-        if (dateChanged || timeChanged) {
+        // Verifichiamo se è cambiato qualcosa
+        if (!oldDate.equals(updated.getAppointmentDate()) || !oldTime.equals(updated.getAppointmentTime())) {
             try {
+                DateTimeFormatter dFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                 mailService.sendAppointmentUpdate(
+                        updated.getAppointmentId(),
                         updated.getPatient().getEmail(),
                         updated.getPatient().getFirstName(),
-                        oldDate,
-                        oldTime,
-                        newDate,
-                        newTime,
-                        updated.getDoctor().getLastName()
+                        oldDate.format(dFmt),
+                        oldTime.toString(),
+                        updated.getAppointmentDate().format(dFmt),
+                        updated.getAppointmentTime().toString(),
+                        updated.getDoctor().getLastName(),
+                        updated.getAppointmentType().toString()
                 );
             } catch (Exception e) {
                 System.err.println("Errore invio mail modifica: " + e.getMessage());
@@ -130,25 +126,22 @@ public class AppointmentService{
 
     @Transactional
     public void deleteAppointment(Integer id) {
-        // 1. Recuperiamo l'appuntamento completo prima di cancellarlo
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Impossibile eliminare: appuntamento non trovato"));
 
-        // 2. Salviamo i dati necessari per la mail
+        // Prepariamo i dati prima dell'eliminazione
         String patientEmail = appointment.getPatient().getEmail();
         String patientName = appointment.getPatient().getFirstName();
-        String date = appointment.getAppointmentDate().toString();
-        String time = String.valueOf(appointment.getAppointmentTime());
-        String doctorName = appointment.getDoctor().getLastName();
+        String formattedDate = appointment.getAppointmentDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String formattedTime = appointment.getAppointmentTime().toString();
+        String doctorLastName = appointment.getDoctor().getLastName();
+        Integer appId = appointment.getAppointmentId();
 
-        // 3. Eliminiamo il record dal DB
         appointmentRepository.delete(appointment);
 
-        // 4. Inviamo la mail di notifica
         try {
-            mailService.sendAppointmentCancellation(patientEmail, patientName, date, time, doctorName);
+            mailService.sendAppointmentCancellation(appId, patientEmail, patientName, formattedDate, formattedTime, doctorLastName);
         } catch (Exception e) {
-            // Logghiamo l'errore ma l'eliminazione resta valida
             System.err.println("Errore nell'invio della mail di cancellazione: " + e.getMessage());
         }
     }

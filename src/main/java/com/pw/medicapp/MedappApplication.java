@@ -15,10 +15,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
                 description = "Documentazione auto-generata con swagger del backend scritto per il project work AA2025/2026"
         )
 )
-public class MedicappApplication {
+public class MedappApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MedicappApplication.class, args);
+		SpringApplication.run(MedappApplication.class, args);
 	}
 
 }

@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 
