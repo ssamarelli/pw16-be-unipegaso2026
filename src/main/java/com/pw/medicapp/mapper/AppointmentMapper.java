@@ -11,21 +11,26 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring")
 public interface AppointmentMapper {
 
-    @Mapping(source = "doctor.userId", target = "doctorId")
-    @Mapping(source = "doctor.lastName", target = "doctorName")
-    @Mapping(source = "patient.userId", target = "patientId")
-    @Mapping(source = "patient.lastName", target = "patientName")
-    @Mapping(source = "appointmentDate", target = "date")        // ← entity → DTO
+    // Da ENTITY a DTO (quando restituisci i dati al frontend)
+    @Mapping(source = "doctor.fiscalCode", target = "doctorFiscalCode")
+    @Mapping(target = "doctorName", expression = "java(\"Dott. \" + appointment.getDoctor().getLastName() + \" \" + appointment.getDoctor().getFirstName())")
+    @Mapping(source = "patient.fiscalCode", target = "patientFiscalCode")
+    @Mapping(target = "patientName", expression = "java(appointment.getPatient().getFirstName() + \" \" + appointment.getPatient().getLastName())")
+    @Mapping(source = "appointmentDate", target = "date")
     @Mapping(source = "appointmentTime", target = "time")
     AppointmentDTO toDto(Appointment appointment);
 
-    @Mapping(source = "date", target = "appointmentDate")        // ← DTO → entity
+    // Da DTO a ENTITY (quando crei un nuovo appuntamento)
+    @Mapping(source = "date", target = "appointmentDate")
     @Mapping(source = "time", target = "appointmentTime")
-    @Mapping(target = "patient", ignore = true)                  // gestito nel service
-    @Mapping(target = "doctor", ignore = true)                   // gestito nel service
-    @Mapping(target = "appointmentId", ignore = true)            // mai dal client
+    @Mapping(target = "patient", ignore = true)        // Gestito nel Service tramite CF
+    @Mapping(target = "doctor", ignore = true)         // Gestito nel Service tramite CF
+    @Mapping(target = "appointmentId", ignore = true)  // Autogenerato dal DB
+    @Mapping(target = "appointmentStatus", ignore = true) // Gestito nel Service/Controller
+    @Mapping(target = "appointmentType", ignore = true)   // Gestito nel Service/Controller
     Appointment toEntity(AppointmentDTO appointmentDTO);
 
+    // UPDATE: Da DTO a ENTITY esistente
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "appointmentId", ignore = true)
     @Mapping(target = "patient", ignore = true)

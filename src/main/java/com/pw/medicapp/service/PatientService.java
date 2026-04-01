@@ -1,15 +1,12 @@
 package com.pw.medicapp.service;
 
-import com.pw.medicapp.DTO.HistoryDTO;
 import com.pw.medicapp.DTO.PatientDTO;
 import com.pw.medicapp.mapper.UserMapper;
 import com.pw.medicapp.model.Patient;
 import com.pw.medicapp.repository.PatientRepository;
-import com.pw.medicapp.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,7 +28,7 @@ public class PatientService {
     }
 
     @Transactional
-    public PatientDTO updatePatientHistory(String fiscalCode, HistoryDTO historyDTO) {
+    public PatientDTO updatePatientHistory(String fiscalCode, PatientDTO historyDTO) {
         Patient patient = patientRepository.findByFiscalCode(fiscalCode)
                 .orElseThrow(() -> new EntityNotFoundException("Paziente non trovato: " + fiscalCode));
 

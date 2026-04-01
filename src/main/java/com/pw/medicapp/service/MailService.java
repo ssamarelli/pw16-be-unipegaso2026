@@ -14,56 +14,78 @@ public class MailService {
 
     @Async
     public void sendAppointmentConfirmation(Integer appointmentId, String toEmail, String patientName, String date, String time, String doctorName, String type) {
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Conferma Appuntamento - MedApp");
-        message.setText("Gentile " + patientName + ",\n\n" +
-                "Ti confermiamo che il tuo appuntamento " + appointmentId + " è stato registrato con successo.\n\n" +
-                "Dettagli:\n" +
-                "- Data: " + date + "\n" +
-                "- Orario: " + time + "\n" +
-                "- Tipologia: " + type + "\n" +
-                "- Medico: Dott. " + doctorName + "\n\n" +
-                "Cordiali saluti,\nLo staff di MedApp");
 
+        String emailText = String.format(
+                "Gentile %s,\n\n" +
+                        "Ti confermiamo che il tuo appuntamento n. %d è stato registrato con successo.\n\n" +
+                        "DETTAGLI APPUNTAMENTO:\n" +
+                        "- Data: %s\n" +
+                        "- Orario: %s\n" +
+                        "- Tipologia: %s\n" +
+                        "- Medico: %s\n\n" +
+                        "Ti ringraziamo per aver scelto MedApp.\n\n" +
+                        "Cordiali saluti,\n" +
+                        "Lo staff di MedApp",
+                patientName, appointmentId, date, time, type, doctorName
+        );
+
+        message.setText(emailText);
         mailSender.send(message);
     }
 
     @Async
     public void sendAppointmentCancellation(Integer appointmentId, String toEmail, String patientName, String date, String time, String doctorName) {
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Annullamento Appuntamento - MedApp");
-        message.setText("Gentile " + patientName + ",\n\n" +
-                "Ti informiamo che il tuo appuntamento " + appointmentId + " è stato annullato.\n\n" +
-                "Dettagli dell'appuntamento rimosso:\n" +
-                "- Data: " + date + "\n" +
-                "- Orario: " + time + "\n" +
-                "- Medico: Dott. " + doctorName + "\n\n" +
-                "Puoi prenotare un nuovo appuntamento chiamando lo studio.\n" +
-                "Ci scusiamo per l'inconveniente.\n\n" +
-                "Cordiali saluti,\nLo staff di MedApp");
 
+        String emailText = String.format(
+                "Gentile %s,\n\n" +
+                        "Ti informiamo che il tuo appuntamento n. %d è stato ANNULLATO.\n\n" +
+                        "Dettagli appuntamento rimosso:\n" +
+                        "- Data: %s\n" +
+                        "- Orario: %s\n" +
+                        "- Medico: %s\n\n" +
+                        "Per fissare un nuovo appuntamento, ti invitiamo a contattare lo studio.\n\n" +
+                        "Cordiali saluti,\n" +
+                        "Lo staff di MedApp",
+                patientName, appointmentId, date, time, doctorName
+        );
+
+        message.setText(emailText);
         mailSender.send(message);
     }
 
     @Async
     public void sendAppointmentUpdate(Integer appointmentId, String toEmail, String patientName, String oldDate, String oldTime, String newDate, String newTime, String doctorName, String type) {
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Modifica Appuntamento - MedApp");
-        message.setText("Gentile " + patientName + ",\n\n" +
-                "Ti informiamo che i dettagli del tuo appuntamento " + appointmentId + " sono stati modificati.\n\n" +
-                "Vecchi dettagli:\n" +
-                "- Data: " + oldDate + " alle " + oldTime + "\n\n" +
-                "Nuovi dettagli:\n" +
-                "- Data: " + newDate + "\n" +
-                "- Orario: " + newTime + "\n" +
-                "- Tipologia: " + type + "\n" +
-                "- Medico: Dott. " + doctorName + "\n\n" +
-                "Ti aspettiamo in studio.\n\n" +
-                "Cordiali saluti,\nLo staff di MedApp");
 
+        // Costruiamo il testo in modo pulito
+        String emailText = String.format(
+                "Gentile %s,\n\n" +
+                        "Ti informiamo che i dettagli del tuo appuntamento n. %d sono stati modificati.\n\n" +
+                        "VECCHI DETTAGLI:\n" +
+                        "- Data: %s alle ore %s\n\n" +
+                        "NUOVI DETTAGLI:\n" +
+                        "- Data: %s\n" +
+                        "- Orario: %s\n" +
+                        "- Tipologia: %s\n" +
+                        "- Medico: %s\n\n" + // Rimosso "Dott." manuale perché è già nel parametro
+                        "Ti aspettiamo in studio.\n\n" +
+                        "Cordiali saluti,\n" +
+                        "Lo staff di MedApp",
+                patientName, appointmentId, oldDate, oldTime, newDate, newTime, type, doctorName
+        );
+
+        message.setText(emailText);
         mailSender.send(message);
     }
 }
