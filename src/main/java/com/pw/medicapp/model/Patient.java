@@ -37,7 +37,7 @@ public class Patient {
     private LocalDate dob;
     @Column(name = "birthplace")
     private String birthplace;
-    @Column(name = "fiscal_code", nullable = false, unique = true) // Vincolo anche a livello DB
+    @Column(name = "fiscal_code", nullable = false, unique = true)
     private String fiscalCode;
     @Column(name = "diagnosis")
     private String diagnosis;

@@ -1,13 +1,19 @@
 package com.pw.medicapp.service;
 
 import com.pw.medicapp.exceptionHandler.UserException;
+import com.pw.medicapp.model.Appointment;
 import com.pw.medicapp.model.Doctor;
+import com.pw.medicapp.model.Patient;
 import com.pw.medicapp.model.enums.UserRole;
+import com.pw.medicapp.repository.AppointmentRepository;
 import com.pw.medicapp.repository.DoctorRepository;
+import com.pw.medicapp.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,14 +22,23 @@ public class DoctorService {
     @Autowired
     private DoctorRepository doctorRepository;
 
-//    @Autowired
-//    private AppointmentRepository appointmentRepository;
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    public Doctor getDoctorByFiscalCode(String fiscalCode) {
+        // Recuperiamo l'Optional dal repository e lo "spacchettiamo"
+        return doctorRepository.getDoctorByFiscalCode(fiscalCode)
+                .orElseThrow(() -> new RuntimeException("Dottore non trovato con codice fiscale: " + fiscalCode));
+    }
 
     @Transactional
     public Doctor createDoctor(Doctor doctor) {
         Optional<Doctor> check = doctorRepository.findByFiscalCode(doctor.getFiscalCode());
         if(check.isPresent()) {
-            throw new UserException("Doctor already exist");
+            throw new UserException("Il codice fiscale è già assegnato ad un dottore");
         }
         doctor.setDoctorId(null);
         doctor.setRole(UserRole.DOCTOR);
@@ -33,7 +48,7 @@ public class DoctorService {
     public Doctor updateDoctor(Doctor doctor) {
         Optional<Doctor> check = doctorRepository.findByFiscalCode(doctor.getFiscalCode());
         if(check.isEmpty()) {
-            throw new UserException("Doctor doesn't exist");
+            throw new UserException("Non esiste un dottore con questo codice fiscale");
         }
         Doctor existing = check.get();
         if (doctor.getFirstName() != null) existing.setFirstName(doctor.getFirstName());
@@ -53,42 +68,41 @@ public class DoctorService {
     public String deleteDoctor(String fiscalCode) {
         Optional<Doctor> check = doctorRepository.findByFiscalCode(fiscalCode);
         if(check.isEmpty()) {
-            throw new UserException("Doctor doesn't exist");
+            throw new UserException("Non esiste un dottore con questo codice fiscale");
         }
         doctorRepository.deleteByFiscalCode(fiscalCode);
         Optional<Doctor> deleted = doctorRepository.findByFiscalCode(fiscalCode);
         if(deleted.isEmpty()) {
-            return "Doctor " +  fiscalCode + " removed correctly";
+            return "Il dottore con codice fiscale  " +  fiscalCode + " è stato rimosso correttamente";
         } else
         {
-            throw new UserException("Doctor has not been removed correctly");
+            throw new UserException("Errore nella rimozione del dottore");
         }
     }
 
-//    public List<PatientDTO> getPatientsByDoctor(String fiscalCode) {
-//        // Verifichiamo prima se il dottore esiste
-//         User user = docRepository.findByFiscalCode(fiscalCode)
-//                .orElseThrow(() -> new RuntimeException("Dottore non trovato con il codice fiscale fornito."));
-//
-//        // Recuperiamo la lista di entità Patient e la mappiamo in DTO
-//        return appointmentRepository.findPatientsByDoctorFiscalCode(fiscalCode)
-//                .stream()
-//                .map(userMapper::toDto) // Assicurati che il mapper gestisca Patient -> PatientDTO
-//                .collect(Collectors.toList());
-//    }
-//
-//
-//    public List<AppointmentDTO> getAppointmentsByDoctor(String fiscalCode) {
-//        // Verifichiamo se il dottore esiste per dare un errore chiaro in caso contrario
-//        User user = docRepository.findByFiscalCode(fiscalCode)
-//                .orElseThrow(() -> new RuntimeException("Dottore non trovato con il codice fiscale fornito."));
-//
-//        // Recuperiamo le entità e le mappiamo in DTO
-//        return appointmentRepository.findByDoctorFiscalCode(fiscalCode)
-//                .stream()
-//                .map(appointmentMapper::toDto)
-//                .collect(Collectors.toList());
-//    }
+    public List<Patient> getPatientsByDoctor(String fiscalCode) {
+        Doctor doctor = doctorRepository.findByFiscalCode(fiscalCode).orElse(null);
+        if (doctor == null) {
+            throw new UserException("Dottore non trovato.");
+        }
 
+        List<Appointment> appointments = appointmentRepository.findByDoctorFiscalCode(fiscalCode);
+        List<String> patientFiscalCodes = new ArrayList<>();
+        for (Appointment app : appointments) {
+            String cf = app.getPatientFiscalCode();
+            if (!patientFiscalCodes.contains(cf)) {
+                patientFiscalCodes.add(cf);
+            }
+        }
+        return patientRepository.findByFiscalCodeIn(patientFiscalCodes);
+    }
+
+    public List<Appointment> getAppointmentsByDoctor(String fiscalCode) {
+        Doctor doctor = doctorRepository.findByFiscalCode(fiscalCode).orElse(null);
+        if (doctor == null) {
+            throw new UserException("Dottore non trovato.");
+        }
+        return appointmentRepository.findByDoctorFiscalCode(fiscalCode);
+    }
 
 }

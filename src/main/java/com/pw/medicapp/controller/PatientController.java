@@ -1,8 +1,9 @@
 package com.pw.medicapp.controller;
 
+import com.pw.medicapp.model.Appointment;
+import com.pw.medicapp.model.Doctor;
 import com.pw.medicapp.model.Patient;
 import com.pw.medicapp.service.PatientService;
-import com.pw.medicapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/patient")
@@ -24,8 +26,16 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
-    @Autowired
-    private UserService userService;
+    @GetMapping("/{fiscalCode}")
+    public ResponseEntity<Patient> getPatientByFiscalCode(@PathVariable String fiscalCode) {
+        return ResponseEntity.ok(patientService.getPatientByFiscalCode(fiscalCode));
+    }
+
+    @GetMapping("/{fiscalCode}/appointments")
+    public ResponseEntity<List<Appointment>> getAppointmentsByPatient(@PathVariable String fiscalCode) {
+        // Questa chiamata restituirà la lista degli appuntamenti legati a quel codice fiscale
+        return ResponseEntity.ok(patientService.getAppointmentsByPatient(fiscalCode));
+    }
 
     @PostMapping("/new-patient")
     public ResponseEntity<Patient> createPatient(@Valid @RequestBody Patient patient) {
@@ -41,8 +51,8 @@ public class PatientController {
     }
 
     //delete
-    @DeleteMapping("/delete-patient/{fiscalCode}")
-    public String deletePatient(@Valid @RequestParam String fiscalCode) {
+    @DeleteMapping("/delete/{fiscalCode}")
+    public String deletePatient(@Valid @PathVariable String fiscalCode) {
         return patientService.deletePatient(fiscalCode);
     }
 

@@ -1,7 +1,11 @@
 package com.pw.medicapp.controller;
 
+import com.pw.medicapp.model.Appointment;
 import com.pw.medicapp.model.Doctor;
+import com.pw.medicapp.model.Patient;
+import com.pw.medicapp.repository.DoctorRepository;
 import com.pw.medicapp.service.DoctorService;
+import com.pw.medicapp.service.PatientService;
 import com.pw.medicapp.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +28,15 @@ import java.util.List;
 public class DoctorController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private DoctorService doctorService;
 
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @GetMapping("/{fiscalCode}")
+    public ResponseEntity<Doctor> getDoctorByFiscalCode(@PathVariable String fiscalCode) {
+        return ResponseEntity.ok(doctorService.getDoctorByFiscalCode(fiscalCode));
+    }
 
     @PostMapping("/new-doctor")
     public ResponseEntity<Doctor> createDoctor(@Valid @RequestBody Doctor doctor) {
@@ -45,30 +53,18 @@ public class DoctorController {
 
     //delete
     @DeleteMapping("/delete-doctor/{fiscalCode}")
-    public String deleteDoctor(@Valid @RequestParam String fiscalCode) {
+    public String deleteDoctor(@Valid @PathVariable String fiscalCode) {
         return doctorService.deleteDoctor(fiscalCode);
     }
 
 
-//    //GET /api/doctor/{id}/appointments
-//    @GetMapping("/{fiscalCode}/appointments")
-//    public ResponseEntity<List<AppointmentDTO>> getDoctorAppointments(@PathVariable String fiscalCode) {
-//        List<AppointmentDTO> appointments = doctorService.getAppointmentsByDoctor(fiscalCode);
-//        return ResponseEntity.ok(appointments);
-//    }
-//
-//     //GET /api/doctor/{id}/patients
-//     @GetMapping("/{fiscalCode}/patients")
-//     public ResponseEntity<List<PatientDTO>> getDoctorPatients(@PathVariable String fiscalCode) {
-//         List<PatientDTO> patients = doctorService.getPatientsByDoctor(fiscalCode);
-//         return ResponseEntity.ok(patients);
-//     }
-//
-//
-//    @PutMapping("/{fiscalCode}/update")
-//    public ResponseEntity<UserDTO> updateDoctor(
-//            @PathVariable String fiscalCode,
-//            @RequestBody DoctorDTO doctorDTO) {
-//        return ResponseEntity.ok(userService.updateUser(fiscalCode, doctorDTO));
-//    }
+    @GetMapping("/{fiscalCode}/patients")
+    public List<Patient> getPatientsByDoctor(@PathVariable String fiscalCode) {
+        return doctorService.getPatientsByDoctor(fiscalCode);
+    }
+
+    @GetMapping("/{fiscalCode}/appointments")
+    public List<Appointment> getAppointmentsByDoctor(@PathVariable String fiscalCode) {
+        return doctorService.getAppointmentsByDoctor(fiscalCode);
+    }
 }
