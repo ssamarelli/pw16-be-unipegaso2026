@@ -8,5 +8,8 @@ import java.util.Optional;
 
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
+
     Optional<Doctor> findByFiscalCode(String codiceFiscale);
+
+    void deleteByFiscalCode(String fiscalCode);
 }

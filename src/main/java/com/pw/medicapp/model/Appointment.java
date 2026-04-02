@@ -40,12 +40,9 @@ public class Appointment {
     private AppointmentStatus appointmentStatus;
     // Relazione N-1 con Patient
     @ManyToOne
-    @JoinColumn(name = "patient_id", referencedColumnName = "user_id")
     private Patient patient;
-
     // Relazione N-1 con Doctor
     @ManyToOne
-    @JoinColumn(name = "doctor_id", referencedColumnName = "user_id")
     private Doctor doctor;
 
 }
