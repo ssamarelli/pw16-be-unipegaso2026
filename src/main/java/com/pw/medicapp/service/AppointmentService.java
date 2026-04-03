@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import org.springframework.scheduling.annotation.Scheduled;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -176,6 +178,31 @@ public class AppointmentService{
         }
 
         return updated;
+    }
+
+    @Scheduled(fixedRate = 60000) // Esegue ogni minuto
+    @Transactional
+    public void autoUpdateCompletedAppointments() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Appointment> all = appointmentRepository.findAll();
+        boolean changed = false;
+
+        for (Appointment app : all) {
+            if (app.getAppointmentStatus() == AppointmentStatus.CONFIRMED 
+                && app.getAppointmentDate() != null 
+                && app.getAppointmentTime() != null) {
+                
+                LocalDateTime appDateTime = LocalDateTime.of(app.getAppointmentDate(), app.getAppointmentTime());
+                if (appDateTime.isBefore(now)) {
+                    app.setAppointmentStatus(AppointmentStatus.COMPLETED);
+                    changed = true;
+                }
+            }
+        }
+        
+        if (changed) {
+            appointmentRepository.saveAll(all);
+        }
     }
 
 }
