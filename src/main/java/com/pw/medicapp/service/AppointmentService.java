@@ -180,7 +180,7 @@ public class AppointmentService{
         return updated;
     }
 
-    @Scheduled(fixedRate = 60000) // Esegue ogni minuto
+    @Scheduled(fixedRate = 10800000) // Esegue ogni 3 ore
     @Transactional
     public void autoUpdateCompletedAppointments() {
         LocalDateTime now = LocalDateTime.now();
